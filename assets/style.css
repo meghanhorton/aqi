@@ -15,7 +15,8 @@ body {
   min-height: 100vh;
   font-family: 'Quicksand', sans-serif;
   font-size: 30px;
-  display: block; }
+  display: block;
+  background: #ccc; }
   body[data-quality="Good"] {
     background: #a2d47f; }
     body[data-quality="Good"] #data {
