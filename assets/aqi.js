@@ -1,22 +1,45 @@
-$(document).ready(function () {
-    // Purple Air Documentation: https://docs.google.com/document/d/15ijz94dXJ-YAZLi9iZ_RaBwrZ4KtYeCy08goGBwnbCU/edit
-    $.getJSON('https://www.purpleair.com/json?key=50HL95ZEMVGJ983O&show=14285', function (data) {
+// Purple Air Documentation: https://docs.google.com/document/d/15ijz94dXJ-YAZLi9iZ_RaBwrZ4KtYeCy08goGBwnbCU/edit
+loadJSON(
+    // Source
+    "https://www.purpleair.com/json?key=50HL95ZEMVGJ983O&show=14285",
+    // Success
+    function(data) { 
         var PM = aqiFromPM(data.results[0].PM2_5Value);
 
         // Output
-        $('#data').html( 
-            `<p>The air quality for <span class="location">El Cerrito, CA</span> is <span class="quality">${getAQIDescription(PM)}</span> with a PM2.5 index of <span class="index">${PM}</span>.<p>`
-            +
-            `<p class="alert">${getAQIMessage(PM).split(":")[1]}</p>`
-            +
-            `<p class="date">Last updated: ${convert_unix_timestamp(data.results[0].LastUpdateCheck)}</p>`
-        );
+        document.querySelector("#data").innerHTML = 
+            `<p>The air quality for <span class="location">El Cerrito, CA</span> is <span class="quality">${getAQIDescription(PM)}</span> with a PM2.5 index of <span class="index">${PM}</span>.<p>` +
+            `<p class="alert">${getAQIMessage(PM).split(":")[1]}</p>` +
+            `<p class="date">Last updated: ${convert_unix_timestamp(data.results[0].LastUpdateCheck)}</p>`;
 
         // Adds data quality to body
-        $('body').attr('data-quality',getAQIDescription(PM));
+        document.querySelector("body").setAttribute('data-quality',getAQIDescription(PM));
+    },
+    // Error
+    function(xhr) { 
+        console.error(xhr); 
+    }
+);
 
-    });
-})
+// Get JSON
+function loadJSON(path, success, error)
+{
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function()
+    {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                if (success)
+                    success(JSON.parse(xhr.responseText));
+            } else {
+                if (error)
+                    error(xhr);
+            }
+        }
+    };
+    xhr.open("GET", path, true);
+    xhr.send();
+}
 
 // Convert Air Quality Index from PM
 // https://docs.google.com/document/d/15ijz94dXJ-YAZLi9iZ_RaBwrZ4KtYeCy08goGBwnbCU/edit#heading=h.47kx5k34pty3
